@@ -21,7 +21,7 @@
         <td>{{ issue.Priority }}</td>
         <td>{{ issue.Status }}</td>
         <td>{{ issue.Votes }}</td>
-        <td>{{ issue._links.assignee.href }}</td>
+        <td>{{ issue._links.assignee.name }}</td>
         <td>{{ issue.created_at | humanReadableTime }}</td>
         <td>{{ issue.updated_at | humanReadableTime }}</td>
       </tr>  
