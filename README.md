@@ -1,5 +1,10 @@
 # issue_tracker_asw
 
+* Aleix Balletbó
+* Xavier Campos
+* Guillem Castro
+* Carlota Catot
+
 > A Vue.js project
 
 ## Build Setup
