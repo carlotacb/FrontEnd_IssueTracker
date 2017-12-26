@@ -1,5 +1,16 @@
 <template>
   <div id="issueList">
+    <h1>Issues</h1>
+    <div id="filters">
+      <p class="filter-label">Filters:</p>
+      <ul class="filter-status">
+        <button v-on:click="all">All</button>
+        <button v-on:click="open">Open</button>
+        <button v-on:click="assignee(current_user.id)">My Issues</button>
+        <button v-on:click="watching(current_user.id)">Watching</button>
+      </ul>
+    </div>
+    <h2>Issues ({{issues.length}})</h2>
     <table class="issue-list">
     <thead>
       <tr>
@@ -30,8 +41,8 @@
     <ul v-if="errors && errors.length">
       <li v-for="error of errors">
         {{error.message}}
-    </li>
-  </ul>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -47,6 +58,7 @@ export default {
   },
   data () {
     return {
+      currentUser: {},
       issues: [],
       errors: []
     }
@@ -56,7 +68,42 @@ export default {
       this.issues = response.data;
     }).catch(e => {
       this.errors.push(e);
-    })
+    });
+    HTTP.get('/users/current_user').then(response => {
+      this.current_user = response.data;
+    }).catch(e => {
+      this.errors.push(e);
+    });
+  },
+  methods: {
+    all: function (event) {
+      HTTP.get('/issues').then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
+    },
+    open: function (event) {
+      HTTP.get('/issues?status=New%26Open').then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
+    },
+    assignee: function (id) {
+      HTTP.get('/issues?assignee='+id).then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
+    },
+    watching: function (id) {
+      HTTP.get('/issues?watcher='+id).then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
+    }
   }
 }
 </script>
@@ -66,7 +113,6 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }
