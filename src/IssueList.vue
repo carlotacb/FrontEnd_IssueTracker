@@ -28,11 +28,11 @@
     <tbody>
       <tr v-for="issue in issues">
         <td>{{ issue.Title }}</td>
-        <td>{{ issue.Type }}</td>
-        <td>{{ issue.Priority }}</td>
-        <td>{{ issue.Status }}</td>
+        <td class="td-clickable" v-on:click="type(issue.Type)">{{ issue.Type }}</td>
+        <td class="td-clickable" v-on:click="priority(issue.Priority)">{{ issue.Priority }}</td>
+        <td class="td-clickable" v-on:click="status(issue.Status)">{{ issue.Status }}</td>
         <td>{{ issue.Votes }}</td>
-        <td>{{ issue._links.assignee.name }}</td>
+        <td class="td-clickable" v-on:click="assignee(issue._links.assignee.id)">{{ issue._links.assignee.name }}</td>
         <td>{{ issue.created_at | humanReadableTime }}</td>
         <td>{{ issue.updated_at | humanReadableTime }}</td>
       </tr>  
@@ -103,6 +103,27 @@ export default {
       }).catch(e => {
         this.errors.push(e);
       })
+    },
+    status: function (status) {
+      HTTP.get('/issues?status='+status).then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
+    },
+    priority: function (priority) {
+      HTTP.get('/issues?priority='+priority).then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
+    },
+    type: function (type) {
+      HTTP.get('/issues?type='+type).then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
     }
   }
 }
@@ -117,6 +138,10 @@ export default {
   margin-top: 60px;
 }
 
+.td-clickable:hover {
+  color: #42b983
+}
+
 h1, h2 {
   font-weight: normal;
 }
@@ -129,9 +154,5 @@ ul {
 li {
   display: inline-block;
   margin: 0 10px;
-}
-
-a {
-  color: #42b983;
 }
 </style>
