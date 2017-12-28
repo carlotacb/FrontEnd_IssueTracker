@@ -27,12 +27,12 @@
     </thead>
     <tbody>
       <tr v-for="issue in issues">
-        <td>{{ issue.Title }}</td>
+        <td v-if="issue.id" class="td-clickable"><router-link :to="{ name: 'issue', params: { id: issue.id }}">{{ issue.Title }}</router-link></td>
         <td class="td-clickable" v-on:click="type(issue.Type)">{{ issue.Type }}</td>
         <td class="td-clickable" v-on:click="priority(issue.Priority)">{{ issue.Priority }}</td>
         <td class="td-clickable" v-on:click="status(issue.Status)">{{ issue.Status }}</td>
         <td>{{ issue.Votes }}</td>
-        <td class="td-clickable" v-on:click="assignee(issue._links.assignee.id)">{{ issue._links.assignee.name }}</td>
+        <td v-if="issue._links" class="td-clickable" v-on:click="assignee(issue._links.assignee.id)">{{ issue._links.assignee.name }}</td>
         <td>{{ issue.created_at | humanReadableTime }}</td>
         <td>{{ issue.updated_at | humanReadableTime }}</td>
       </tr>  

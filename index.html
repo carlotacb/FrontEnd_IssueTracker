@@ -5,7 +5,12 @@
     <title>issue_tracker_asw</title>
   </head>
   <body>
-    <div id="issueList"></div>
+    <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
+      <a class="navbar-brand" href="/">Issue tracker</a>
+    </nav>
+    <div id="app">
+      <router-view></router-view>
+    </div>
     <script src="/dist/build.js"></script>
   </body>
 </html>
