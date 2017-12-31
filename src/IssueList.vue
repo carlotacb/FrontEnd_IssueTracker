@@ -2,15 +2,15 @@
   <div id="issueList">
     <h1>Issues</h1>
     <div id="filters">
-      <ul class="filter-status"> Filters:
-        <button v-on:click="all">All</button>
-        <button v-on:click="open">Open</button>
-        <button v-on:click="assignee(current_user.id)">My Issues</button>
-        <button v-on:click="watching(current_user.id)">Watching</button>
+      <ul class="filter-buttons">Filters:
+        <b-button v-on:click="all">All</b-button>
+        <b-button v-on:click="open">Open</b-button>
+        <b-button v-on:click="assignee(current_user.id)">My Issues</b-button>
+        <b-button v-on:click="watching(current_user.id)">Watching</b-button>
       </ul>
     </div>
     <h3>Issues ({{issues.length}})</h3>
-    <b-table striped hover responsive="md" :items="issues" :fields="fields">
+    <b-table striped hover responsive="lg" :items="issues" :fields="fields">
       <template slot="Title" scope="data">
         <router-link :to="{ name: 'issue', params: { id: data.item.id }}">{{ data.item.Title }}</router-link>
       </template>
@@ -31,6 +31,11 @@
       </template>
       <template slot="updated_at" scope="data">
         {{data.item.updated_at | humanReadableTime}}
+      </template>
+      <template slot="is_watched_by_current_user" scope="data">
+        <b-button size="sm" @click.stop="" class="mr-2">
+          {{data.item.is_watched_by_current_user ? 'Unwatch' : 'Watch'}}
+        </b-button>
       </template>
     </b-table>
     <!--
@@ -86,7 +91,7 @@ export default {
   data () {
     return {
       currentUser: {},
-      fields: ['Title', 'Type', 'Priority', 'Status', 'Votes', {key:'_links', label:'Assignee'}, {key:'created_at', label:'Created'}, {key:'updated_at', label:'Updated'}],
+      fields: ['Title', 'Type', 'Priority', 'Status', 'Votes', {key:'_links', label:'Assignee'}, {key:'created_at', label:'Created'}, {key:'updated_at', label:'Updated'}, {key: 'is_watched_by_current_user', label:' '}],
       issues: [],
       errors: []
     }
@@ -171,6 +176,11 @@ export default {
 
 .td-clickable:hover {
   color: #008ae6
+}
+
+.filter-buttons{
+  font-size: 150%;
+  color: gray;
 }
 
 h1, h2 {
