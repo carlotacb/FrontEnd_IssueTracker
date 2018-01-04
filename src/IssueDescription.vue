@@ -29,7 +29,28 @@
                 </form>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 margin">
+
+          <b-button-group>
+
+            <b-button variant="primary" v-on:click="changetoResolvedOpen">
+              {{issue.Status}}
+            </b-button>
+
+            <b-dropdown right text="Menu">
+              <b-dropdown-item v-on:click="changestatus('New')">New</b-dropdown-item>
+              <b-dropdown-item v-on:click="changestatus('Open')">Open</b-dropdown-item>
+              <b-dropdown-item v-on:click="changestatus('On Hold')">On Hold</b-dropdown-item>
+              <b-dropdown-item v-on:click="changestatus('Resolved')">Resolved</b-dropdown-item>
+              <b-dropdown-item v-on:click="changestatus('Duplicate')">Duplicate</b-dropdown-item>
+              <b-dropdown-item v-on:click="changestatus('Invalid')">Invalid</b-dropdown-item>
+              <b-dropdown-item v-on:click="changestatus('Won\'t fix')">Won't fix</b-dropdown-item>
+              <b-dropdown-item v-on:click="changestatus('Closed')">Closed</b-dropdown-item>
+            </b-dropdown>
+          </b-button-group>
+
+          <button type="button" class="btn btn-light">Edit</button>
+
             <div class="right-box">
                 <dl>
                     <dt>Assignee</dt> <dd v-if="issue._links"> {{issue._links.assignee.name}}</dd>
@@ -48,7 +69,7 @@
 import {HTTP} from './http-common';
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-import $ from 'jquery' 
+import $ from 'jquery'
 import moment from 'moment'
 
 export default {
@@ -65,6 +86,10 @@ export default {
         comments: [],
         errors: [],
         commentTextArea: "",
+        seen: true,
+        button: {
+          text: 'Resolved'
+        }
       }
   },
   created() {
@@ -109,10 +134,37 @@ export default {
 
     },
     vote: function(event) {
-        
+
+      HTTP.post("/issues/" + this.issue.id + "/vote").then(response => {
+        this.issue = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
+
     },
     watch: function(event) {
 
+      HTTP.post("/issues/" + this.issue.id + "/watch").then(response => {
+        this.issue = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
+
+    },
+    changetoResolvedOpen: function (event) {
+      data.seen = !data.seen;
+      data.button.text = data.seen ? 'Resolved' : 'Open';
+
+      // Falta que canvi l'estatus a Open o Resolved amb la URL
+    },
+    changestatus: function (newstatus) {
+      HTTP.post("/issues/" + this.issue.id + "/status", {
+        status: newstatus
+      }).then(response => {
+        this.issue = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
     },
     sendComment: function(event) {
         var commentAttachment = $('#attachmentUpload').prop('files')[0];
@@ -169,13 +221,17 @@ export default {
     margin-bottom: 0.1rem;
 }
 
-dt, dd { 
-    margin: 0; 
-    padding: 0; 
-} 
+.margin {
+  margin-top: 5rem;
+}
 
-dt { 
-    float: left; 
-    margin-right: 0.3em; 
+dt, dd {
+    margin: 0;
+    padding: 0;
+}
+
+dt {
+    float: left;
+    margin-right: 0.3em;
 }
 </style>

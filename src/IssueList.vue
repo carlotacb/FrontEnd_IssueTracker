@@ -33,40 +33,12 @@
         {{data.item.updated_at | humanReadableTime}}
       </template>
       <template slot="is_watched_by_current_user" scope="data">
-        <b-button size="sm" @click.stop="" class="mr-2">
+        <b-button size="sm" v-on:click="watch(data.item.id)" @click.stop="" class="mr-2">
           {{data.item.is_watched_by_current_user ? 'Unwatch' : 'Watch'}}
         </b-button>
       </template>
     </b-table>
-    <!--
-    <table>
-      <thead>
-        <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Type</th>
-            <th scope="col">Priority</th>
-            <th scope="col">Status</th>
-            <th scope="col">Votes</th>
-            <th scope="col">Assignee</th>
-            <th scope="col">Created</th>
-            <th scope="col">Updated</th>
-            <th colspan="3"></th>
-          </tr>
-      </thead>
-      <tbody>
-        <tr v-for="issue in issues">
-          <td v-if="issue.id" class="td-clickable"><router-link :to="{ name: 'issue', params: { id: issue.id }}">{{ issue.Title }}</router-link></td>
-          <td class="td-clickable" v-on:click="type(issue.Type)">{{ issue.Type }}</td>
-          <td class="td-clickable" v-on:click="priority(issue.Priority)">{{ issue.Priority }}</td>
-          <td class="td-clickable" v-on:click="status(issue.Status)">{{ issue.Status }}</td>
-          <td>{{ issue.Votes }}</td>
-          <td v-if="issue._links" class="td-clickable" v-on:click="assignee(issue._links.assignee.id)">{{ issue._links.assignee.name }}</td>
-          <td>{{ issue.created_at | humanReadableTime }}</td>
-          <td>{{ issue.updated_at | humanReadableTime }}</td>
-        </tr>  
-      </tbody>
-    </table>
-    -->
+
     <ul v-if="errors && errors.length">
       <li v-for="error of errors">
         {{error.message}}
@@ -91,7 +63,7 @@ export default {
   data () {
     return {
       currentUser: {},
-      fields: ['Title', 'Type', 'Priority', 'Status', 'Votes', {key:'_links', label:'Assignee'}, {key:'created_at', label:'Created'}, {key:'updated_at', label:'Updated'}, {key: 'is_watched_by_current_user', label:' '}],
+      fields: ['Id', 'Title', 'Type', 'Priority', 'Status', 'Votes', {key:'_links', label:'Assignee'}, {key:'created_at', label:'Created'}, {key:'updated_at', label:'Updated'}, {key: 'is_watched_by_current_user', label:' '}],
       issues: [],
       errors: []
     }
@@ -153,6 +125,13 @@ export default {
     },
     type: function (type) {
       HTTP.get('/issues?type='+type).then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      })
+    },
+    watch: function (id) {
+      HTTP.post("/issues/" + id + "/watch").then(response => {
         this.issues = response.data;
       }).catch(e => {
         this.errors.push(e);
