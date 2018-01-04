@@ -11,25 +11,25 @@
     </div>
     <h3>Issues ({{issues.length}})</h3>
     <b-table striped hover responsive="lg" :items="issues" :fields="fields">
-      <template slot="Title" scope="data">
+      <template slot="Title" slot-scope="data">
         <router-link :to="{ name: 'issue', params: { id: data.item.id }}">{{ data.item.Title }}</router-link>
       </template>
-      <template slot="Type" scope="data">
+      <template slot="Type" slot-scope="data">
         <span class="td-clickable" v-on:click="type(data.item.Type)">{{ data.item.Type }}</span>
       </template>
-      <template slot="Priority" scope="data">
+      <template slot="Priority" slot-scope="data">
         <span class="td-clickable" v-on:click="priority(data.item.Priority)">{{ data.item.Priority }}</span>
       </template>
-      <template slot="Status" scope="data">
+      <template slot="Status" slot-scope="data">
         <span class="td-clickable" v-on:click="status(data.item.Status)">{{ data.item.Status }}</span>
       </template>
-      <template slot="_links" scope="data">
+      <template slot="_links" slot-scope="data">
         <span class="td-clickable" v-on:click="assignee(data.value.assignee.id)">{{ data.value.assignee.name }}</span>
       </template>
-      <template slot="created_at" scope="data">
+      <template slot="created_at" slot-scope="data">
         {{data.item.created_at | humanReadableTime}}
       </template>
-      <template slot="updated_at" scope="data">
+      <template slot="updated_at" slot-scope="data">
         {{data.item.updated_at | humanReadableTime}}
       </template>
       <template slot="is_watched_by_current_user" scope="data">

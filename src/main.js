@@ -1,21 +1,12 @@
+// The Vue build version to load with the `import` command
+// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import router from './router'
 import BootstrapVue from 'bootstrap-vue'
-import VueRouter from 'vue-router'
-import IssueList from './IssueList.vue'
-import IssueDescription from './IssueDescription.vue'
 
-window.Vue = Vue;
+Vue.config.productionTip = false
 
-Vue.use(BootstrapVue);
-Vue.use(VueRouter);
-
-const router = new VueRouter({
-  mode: 'history',
-  routes: [
-    {path: '/', component: require("./IssueList.vue").default},
-    {name: 'issue', path: '/issues/:id', component: require("./IssueDescription.vue").default}
-  ]
-});
+Vue.use(BootstrapVue)
 
 const app = new Vue({
   router
