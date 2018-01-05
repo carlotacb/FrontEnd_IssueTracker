@@ -8,6 +8,7 @@
         <b-button v-on:click="assignee(current_user.id)">My Issues</b-button>
         <b-button v-on:click="watching(current_user.id)">Watching</b-button>
       </ul>
+      <a href="/issues/new" id="create-button" class="btn btn-primary">New</a> 
     </div>
     <h3>Issues ({{issues.length}})</h3>
     <b-table striped hover responsive="lg" :items="issues" :fields="fields">
@@ -169,5 +170,13 @@ h1, h2 {
 ul {
   list-style-type: none;
   padding: 0;
+}
+
+.filters {
+  display: inline-block;
+}
+
+#create-button {
+  float: right;
 }
 </style>

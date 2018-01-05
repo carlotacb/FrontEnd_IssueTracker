@@ -10,6 +10,7 @@ export default new Router({
   mode: 'history',
   routes: [
     {path: '/', component: require("@/components/IssueList.vue").default},
+    {name: 'create', path: '/issues/new', component: require("@/components/IssueCreation.vue").default},
     {name: 'issue', path: '/issues/:id', component: require("@/components/IssueDescription.vue").default}
   ]
 })
