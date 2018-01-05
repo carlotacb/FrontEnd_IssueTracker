@@ -6,6 +6,10 @@
                 <h1>{{ issue.Title }} <span class="badge badge-secondary"> {{issue.Status}} </span></h1>
                 <p v-if="issue.creator"><b>{{issue.creator.name}}</b> created this issue {{issue.created_at | humanReadableTime }}</p>
                 <p>{{ issue.Description }}</p>
+                <div v-if="attachment.url" class="attachment">
+                    <img v-if="attachment.attachment_content_type.startsWith('image')" :src="attachment.url">
+                    <a class="caption" :href="attachment.url">{{attachment.attachment_file_name}}</a>
+                </div>
                 <div class="separator"><hr /></div>
             </div>
             <div class="container" id="comments">
@@ -13,8 +17,8 @@
                 <div class="comment" v-for="comment in comments" :key="comment.id">
                     <p><b>{{comment.creator.name || "Nom usuari"}}</b><br>
                     {{comment.body}}</p>
+                    <a v-if="comment.attachment" :href="comment.attachment.url"><img v-if="comment.attachment" :src="comment.attachment.url"></a>
                     <p>{{comment.created_at | humanReadableTime}}</p>
-                    <img v-if="comment.attachment" :src="comment.attachment.url">
                 </div>
 
                 <form>
@@ -31,23 +35,53 @@
         </div>
         <div class="col-md-4 margin">
 
-          <b-button-group>
+            <b-button-group>
 
-            <b-button variant="primary" v-on:click="changetoResolvedOpen">
-              {{issue.Status}}
-            </b-button>
+                <b-button variant="primary" v-on:click="changetoResolvedOpen">
+                {{issue.Status}}
+                </b-button>
 
-            <b-dropdown right text="Menu">
-              <b-dropdown-item v-on:click="changestatus('New')">New</b-dropdown-item>
-              <b-dropdown-item v-on:click="changestatus('Open')">Open</b-dropdown-item>
-              <b-dropdown-item v-on:click="changestatus('On Hold')">On Hold</b-dropdown-item>
-              <b-dropdown-item v-on:click="changestatus('Resolved')">Resolved</b-dropdown-item>
-              <b-dropdown-item v-on:click="changestatus('Duplicate')">Duplicate</b-dropdown-item>
-              <b-dropdown-item v-on:click="changestatus('Invalid')">Invalid</b-dropdown-item>
-              <b-dropdown-item v-on:click="changestatus('Won\'t fix')">Won't fix</b-dropdown-item>
-              <b-dropdown-item v-on:click="changestatus('Closed')">Closed</b-dropdown-item>
-            </b-dropdown>
-          </b-button-group>
+                <b-dropdown right text="Menu">
+                <b-dropdown-item v-on:click="changestatus('New')">New</b-dropdown-item>
+                <b-dropdown-item v-on:click="changestatus('Open')">Open</b-dropdown-item>
+                <b-dropdown-item v-on:click="changestatus('On Hold')">On Hold</b-dropdown-item>
+                <b-dropdown-item v-on:click="changestatus('Resolved')">Resolved</b-dropdown-item>
+                <b-dropdown-item v-on:click="changestatus('Duplicate')">Duplicate</b-dropdown-item>
+                <b-dropdown-item v-on:click="changestatus('Invalid')">Invalid</b-dropdown-item>
+                <b-dropdown-item v-on:click="changestatus('Won\'t fix')">Won't fix</b-dropdown-item>
+                <b-dropdown-item v-on:click="changestatus('Closed')">Closed</b-dropdown-item>
+                </b-dropdown>
+            </b-button-group>
+
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#attachModal">
+                Attach
+            </button>
+            
+            <div class="modal fade" id="attachModal" tabindex="-1" role="dialog" aria-labelledby="titleModal" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="titleModal">Attach file</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <input type="file" class="form-control-file" id="attachmentUploadIssue">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="attachIssue">Send file</button>
+                </div>
+                </div>
+            </div>
+            </div>
+
+
 
           <button type="button" class="btn btn-light">Edit</button>
 
@@ -67,9 +101,10 @@
 </template>
 <script>
 import {HTTP} from './http-common';
+import 'jquery'
+import $ from 'jquery'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-import $ from 'jquery'
 import moment from 'moment'
 
 export default {
@@ -83,6 +118,7 @@ export default {
       return {
         currentUser: {},
         issue: {},
+        attachment: {},
         comments: [],
         errors: [],
         commentTextArea: "",
@@ -99,6 +135,12 @@ export default {
         var creationDate = new Date();
         creationDate.setTime(Date.parse(issue.created_at));
         this.issue.creationDateString =creationDate.toDateString();
+    }).catch(e => {
+        this.errors.push(e);
+    });
+    HTTP.get('/issues/' + this.$route.params.id + '/attachment').then(response => {
+        this.attachment = response.data;
+        this.$forceUpdate();
     }).catch(e => {
         this.errors.push(e);
     });
@@ -130,6 +172,16 @@ export default {
     })
   },
   methods: {
+    attachIssue: function() {
+        var issueAttachment = $('#attachmentUploadIssue').prop('files')[0];
+        const formData = new FormData();
+        formData.append('file', issueAttachment);
+        HTTP.post("/issues/" + this.issue.id + "/attachment", formData)
+        .then(response => {
+            this.attachment = response.data;
+            this.$forceUpdate();
+        });
+    },
     reload: function() {
 
     },
@@ -233,5 +285,19 @@ dt, dd {
 dt {
     float: left;
     margin-right: 0.3em;
+}
+
+.attachment {
+    vertical-align: top;
+    display: inline-block;
+    text-align: center;
+}
+
+.attachment > img {
+    max-width: 100px;
+}
+
+.attachment > .caption {
+    display: block;
 }
 </style>
