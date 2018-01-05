@@ -30,6 +30,15 @@
             </div>
         </div>
         <div class="col-md-4">
+            <br>
+            <div class="right">
+                <dl>
+                    <b-button v-on:click="deleteIssue">Delete Issue</b-button>
+                    <template>
+                        <router-link :to="{ name: 'editIssue', params: {}}">{{'Edit Issue'}}</router-link>
+                    </template>
+                </dl>
+            </div>
             <div class="right-box">
                 <dl>
                     <dt>Assignee</dt> <dd v-if="issue._links"> {{issue._links.assignee.name}}</dd>
@@ -142,6 +151,13 @@ export default {
             }
         });
         this.commentTextArea = "";
+    },
+    deleteIssue: function (event){
+        HTTP.delete("/issues/" + this.issue.id);
+        router.push('/issues');
+    },
+    editIssue: function (){
+        
     }
   }
 }

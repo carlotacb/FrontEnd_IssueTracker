@@ -9,6 +9,10 @@
         <b-button v-on:click="watching(current_user.id)">Watching</b-button>
       </ul>
     </div>
+    <template>
+      <router-link :to="{ name: 'issueNew', params: {}}">{{'+ New Issue'}}</router-link>
+    </template>
+    
     <h3>Issues ({{issues.length}})</h3>
     <b-table striped hover responsive="lg" :items="issues" :fields="fields">
       <template slot="Title" slot-scope="data">
