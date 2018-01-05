@@ -32,8 +32,8 @@
       <template slot="updated_at" slot-scope="data">
         {{data.item.updated_at | humanReadableTime}}
       </template>
-      <template slot="is_watched_by_current_user" scope="data">
-        <b-button size="sm" v-on:click="watch(data.item.id)" @click.stop="" class="mr-2">
+      <template slot="is_watched_by_current_user" slot-scope="data">
+        <b-button size="sm" @click.stop="watch(data.item.id, data.index)" class="mr-2">
           {{data.item.is_watched_by_current_user ? 'Unwatch' : 'Watch'}}
         </b-button>
       </template>
@@ -63,7 +63,7 @@ export default {
   data () {
     return {
       currentUser: {},
-      fields: ['Id', 'Title', 'Type', 'Priority', 'Status', 'Votes', {key:'_links', label:'Assignee'}, {key:'created_at', label:'Created'}, {key:'updated_at', label:'Updated'}, {key: 'is_watched_by_current_user', label:' '}],
+      fields: ['Title', 'Type', 'Priority', 'Status', 'Votes', {key:'_links', label:'Assignee'}, {key:'created_at', label:'Created'}, {key:'updated_at', label:'Updated'}, {key: 'is_watched_by_current_user', label:' '}],
       issues: [],
       errors: []
     }
@@ -130,9 +130,9 @@ export default {
         this.errors.push(e);
       })
     },
-    watch: function (id) {
+    watch: function (id, index) {
       HTTP.post("/issues/" + id + "/watch").then(response => {
-        this.issues = response.data;
+        this.issues[index].is_watched_by_current_user = !this.issues[index].is_watched_by_current_user;
       }).catch(e => {
         this.errors.push(e);
       })
