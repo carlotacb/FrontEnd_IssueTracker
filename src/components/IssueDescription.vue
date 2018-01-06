@@ -34,18 +34,35 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <br>
-            <div class="right">
-                <dl>
-                        <b-button v-on:click="deleteIssue">Delete Issue</b-button>
-                        
-                   
-                    <template>
-                        <router-link :to="{ name: 'editIssue', params: {}}" class="btn btn-primary">{{'Edit Issue'}}</router-link>
-                    </template>
-                </dl>
+        <div class="col-md-4 issue-description">
+            <div class="buttons">
+                <b-button-group>
+
+                    <b-button variant="primary" v-on:click="changetoResolvedOpen">
+                    {{issue.Status}}
+                    </b-button>
+
+                    <b-dropdown right text="Menu">
+                    <b-dropdown-item v-on:click="changestatus('New')">New</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Open')">Open</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('On Hold')">On Hold</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Resolved')">Resolved</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Duplicate')">Duplicate</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Invalid')">Invalid</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Won\'t fix')">Won't fix</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Closed')">Closed</b-dropdown-item>
+                    </b-dropdown>
+                </b-button-group>
             </div>
+            <br>
+            <div class="buttons">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#attachModal">
+                    Attach
+                </button>
+                <b-button v-on:click="deleteIssue">Delete Issue</b-button>
+                <router-link :to="{ name: 'editIssue', params: {}}" class="btn btn-primary">{{'Edit Issue'}}</router-link>
+            </div>
+            <br>
             <div class="right-box">
                 <dl>
                     <dt>Assignee</dt> <dd v-if="issue._links"> {{issue._links.assignee.name}}</dd>
@@ -60,27 +77,7 @@
 
         <div class="col-md-4 margin">
 
-            <b-button-group>
-
-                <b-button variant="primary" v-on:click="changetoResolvedOpen">
-                {{issue.Status}}
-                </b-button>
-
-                <b-dropdown right text="Menu">
-                <b-dropdown-item v-on:click="changestatus('New')">New</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Open')">Open</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('On Hold')">On Hold</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Resolved')">Resolved</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Duplicate')">Duplicate</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Invalid')">Invalid</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Won\'t fix')">Won't fix</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Closed')">Closed</b-dropdown-item>
-                </b-dropdown>
-            </b-button-group>
-
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#attachModal">
-                Attach
-            </button>
+            
             
             <div class="modal fade" id="attachModal" tabindex="-1" role="dialog" aria-labelledby="titleModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -277,12 +274,15 @@ export default {
 }
 
 .right-box {
-    margin-top: 2rem;
+    margin-top: 1rem;
     text-align: left;
     padding: 5px;
     border: solid 1px #cccccc;
     border-radius: 5px;
 }
+
+.buttons {}
+
 .right-box > dl {
     margin-bottom: 0.1rem;
 }
