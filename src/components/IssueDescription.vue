@@ -38,8 +38,11 @@
             <div class="buttons">
                 <b-button-group>
 
-                    <b-button variant="primary" v-on:click="changetoResolvedOpen">
-                    {{issue.Status}}
+                    <b-button v-if="issue.Status == 'Open' || issue.Status == 'New'" variant="primary" v-on:click="changestatus('Resolved')">
+                        Resolve
+                    </b-button>
+                    <b-button v-else variant="primary" v-on:click="changestatus('Open')">
+                        Open
                     </b-button>
 
                     <b-dropdown right text="Menu">
@@ -210,14 +213,8 @@ export default {
       })
 
     },
-    changetoResolvedOpen: function (event) {
-      data.seen = !data.seen;
-      data.button.text = data.seen ? 'Resolved' : 'Open';
-
-      // Falta que canvi l'estatus a Open o Resolved amb la URL
-    },
     changestatus: function (newstatus) {
-      HTTP.post("/issues/" + this.issue.id + "/status", {
+      HTTP.put("/issues/" + this.issue.id + "/status", {
         status: newstatus
       }).then(response => {
         this.issue = response.data;
