@@ -8,10 +8,9 @@
         <b-button v-on:click="assignee(current_user.id)">My Issues</b-button>
         <b-button v-on:click="watching(current_user.id)">Watching</b-button>
       </ul>
-      <a href="/issues/new" id="create-button" class="btn btn-primary">New</a> 
     </div>
     <template>
-      <router-link :to="{ name: 'issueNew', params: {}}">{{'+ New Issue'}}</router-link>
+      <router-link :to="{ name: 'issueNew', params: {}}" class="btn btn-primary" id="create-button" style="margin-right:30px;margin-bottom:15px">{{'+ New Issue'}}</router-link>
     </template>
     
     <h3>Issues ({{issues.length}})</h3>

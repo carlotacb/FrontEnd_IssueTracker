@@ -1,127 +1,155 @@
 <template>
-  <div id="issueNew">
-    <h1>Edit Issue</h1>
-    <br>
-    <div id="formulario">
-      <lu>
-        <p>Title <input v-model="title" placeholder=""></p>
-        <p>Description <textarea v-model="description" placeholder=""></textarea></p>
-        <p>Type <select v-model="type">
-          <option disabled value="">Please select one</option>
-          <option>Bug</option>
-          <option>Proposal</option>
-          <option>Task</option>
-          <option>Enhancement</option>
-        </select></p>
-        <p>Priority <select v-model="priority">
-          <option disabled value="">Please select one</option>
-          <option>Trivial</option>
-          <option>Minor</option>
-          <option>Major</option>
-          <option>Critical</option>
-          <option>Blocker</option>
-        </select></p>
-        <p>Status <select v-model="status">
-          <option disabled value="">Please select one</option>
-          <option>New</option>
-          <option>Open</option>
-          <option>On hold</option>
-          <option>Resolved</option>
-          <option>Duplicate</option>
-          <option>Invalid</option>
-          <option>Won't fix</option>
-          <option>Closed</option>
-        </select></p>
-        <p>Assignee <select v-model="assignee">
-          <option disabled value="">Please select one</option>
-          <option>A</option>
-          <option>B</option>
-          <option>C</option>
-        </select></p>
-      </lu>
-    </div>
-    <br>
-    <button v-on:click="editIssue(postbody)">Edit Issue</button>
-    <template>
-      <router-link :to="{ path: '/', params: {}}">{{'Cancel'}}</router-link>
-    </template>
-
-    <ul v-if="errors && errors.length">
-      <li v-for="error of errors">
-        {{error.message}}
-      </li>
-    </ul>
+  <div class="container">
+      <div class="row">
+          <div class="creation">
+            <h1>Edit Issue</h1>
+            <form>
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input id="title" class="form-control" :prop="this.Title">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" v-model="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignee">Assignee</label>
+                        <select class="form-control" id="assignee" v-model="assignee">
+                            <option disabled selected value>None</option>
+                            <option v-for="user in users" v-bind:key="user.id" :value="user.id">{{user.name}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select class="form-control" id="type" v-model="type" required>
+                            <option disabled selected value></option>
+                            <option value="Bug">Bug</option>
+                            <option value="Enhancement">Enhancement</option>
+                            <option value="Proposal">Proposal</option>
+                            <option value="Task">Task</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priority">Priority</label>
+                        <select class="form-control" id="priority" v-model="priority" required>
+                            <option disabled selected value>Please select</option>
+                            <option value="Trivial">Trivial</option>
+                            <option value="Minor">Minor</option>
+                            <option value="Major">Major</option>
+                            <option value="Critical">Critical</option>
+                            <option value="Blocker">Blocker</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select class="form-control" id="status" v-model="status" required>
+                            <option disabled selected value>Please select</option>
+                            <option value="New">New</option>
+                            <option value="Open">Open</option>
+                            <option value="On hold">On hold</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Duplicate">Duplicate</option>
+                            <option value="Invalid">Invalid</option>
+                            <option value="Won't fix">Won't fix</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="attachment">Attachment</label>
+                        <input type="file" class="form-control-file" id="attachment">
+                    </div>
+                    <a href="#" class="btn btn-primary" v-on:click="send">Create</a>
+                    <template>
+                      <router-link :to="{ path: '/', params: {}}" class="btn btn-primary" id="create-button" style="margin-right:85%">{{'Cancel'}}</router-link>
+                    </template>
+            </form>
+          </div>
+      </div>
   </div>
 </template>
-
 <script>
-import moment from 'moment'
 import {HTTP} from './http-common';
+import 'jquery'
+import $ from 'jquery'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import moment from 'moment'
 
 export default {
-  name: 'issueNew',
-  filters: {
-    humanReadableTime: function(value) {
-      return moment(value).fromNow();
-    }
-  },
-  data () {
-    return {
-      currentUser: {},
-      issues: [],
-      commentTextArea: {},
-      errors: []
-    }
+  name: "IssueCreation",
+  data() {
+      return {
+          issue: {},
+          currentUser: {},
+          users: {},
+          errors: {},
+          title: "",
+          description: "",
+          status: "",
+          priority: "",
+          type: "",
+          assignee: ""
+      }
   },
   created() {
-    /*HTTP.get('/issues').then(response => {
-      this.issues = response.data;
+    HTTP.get('/users/current_user').then(response => {
+        this.currentUser = response.data;
+    }).catch(e => {
+        this.errors.push(e);
+    });
+    HTTP.get('/users').then(response => {
+        this.users = response.data;
+    }).catch(e => {
+        this.errors.push(e);
+    });
+    HTTP.get('/issues'+this.issue.id).then(response => {
+      this.issue = response.data;
     }).catch(e => {
       this.errors.push(e);
     });
-    HTTP.get('/users/current_user').then(response => {
-      this.current_user = response.data;
-    }).catch(e => {
-      this.errors.push(e);
-    });*/
   },
   methods: {
-    editIssue: function () {
-      
+      send: function() {
+        var attachment = $('#attachment').prop('files')[0];
+        const formData = new FormData();
+        formData.append('file', attachment);
+        var data = {
+            Title: this.title,
+            Description: this.description,
+            Status: this.status,
+            Priority: this.priority,
+            Type: this.type,
+        };
+        if (this.assignee !== "") {
+            data.assignee_id = this.assignee;
+        }
+        HTTP.put('/issues/'+this.issues.id, data).then(response => {
+        var issue = response.data;
+        if (attachment) {
+            HTTP.post('/issues/' + issue.id + '/attachment', formData).then(response => {
+                this.$router.push({ name: 'issue', params: { id: issue.id }});
+            });
+        }
+        else {
+            this.$router.push({ name: 'issue', params: { id: issue.id }});
+        }
+        });
+      }
   }
 }
-}
 </script>
-
 <style>
-#issueNew {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  margin-top: 30px;
-  margin-left: 30px;
-  margin-right: 30px;
-  margin-bottom: 30px;
+.creation {
+    margin-top: 20px;
+    width: 100%;
 }
 
-.td-clickable:hover {
-  color: #008ae6
-}
-
-.filter-buttons{
-  font-size: 150%;
-  color: gray;
-}
-
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
+form {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 5%;
+    margin-right: 5%;
 }
 </style>
+
+

@@ -59,6 +59,9 @@
                         <input type="file" class="form-control-file" id="attachment">
                     </div>
                     <a href="#" class="btn btn-primary" v-on:click="send">Create</a>
+                    <template>
+                      <router-link :to="{ path: '/', params: {}}" class="btn btn-primary" id="create-button" style="margin-right:85%">{{'Cancel'}}</router-link>
+                    </template>
             </form>
           </div>
       </div>

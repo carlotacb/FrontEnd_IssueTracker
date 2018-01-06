@@ -38,9 +38,11 @@
             <br>
             <div class="right">
                 <dl>
-                    <b-button v-on:click="deleteIssue">Delete Issue</b-button>
+                        <b-button v-on:click="deleteIssue">Delete Issue</b-button>
+                        
+                   
                     <template>
-                        <router-link :to="{ name: 'editIssue', params: {}}">{{'Edit Issue'}}</router-link>
+                        <router-link :to="{ name: 'editIssue', params: {}}" class="btn btn-primary">{{'Edit Issue'}}</router-link>
                     </template>
                 </dl>
             </div>
@@ -103,11 +105,6 @@
                 </div>
             </div>
             </div>
-
-
-
-          <button type="button" class="btn btn-light">Edit</button>
-
         </div>
     </div>
 </div>
@@ -261,11 +258,8 @@ export default {
         this.commentTextArea = "";
     },
     deleteIssue: function (event){
+
         HTTP.delete("/issues/" + this.issue.id);
-        router.push('/issues');
-    },
-    editIssue: function (){
-        
     }
   }
 }
