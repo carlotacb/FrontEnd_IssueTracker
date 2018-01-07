@@ -1,28 +1,28 @@
 <template>
   <div class="container">
       <div class="row">
-          <div class="creation">
+          <div class="edit">
             <h1>Edit Issue</h1>
             <form>
                     <div class="form-group">
                         <label for="title">Title</label>
-                        <input id="title" class="form-control" :prop="this.Title">
+                        <textarea id="title" class="form-control" rows="1">{{issue.Title}}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea class="form-control" id="description" v-model="description" rows="3"></textarea>
+                        <textarea class="form-control" id="description" rows="3">{{issue.Description}}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="assignee">Assignee</label>
                         <select class="form-control" id="assignee" v-model="assignee">
-                            <option disabled selected value>None</option>
+                            <option disabled selected value>{{ issue._links.assignee.name }}</option>
                             <option v-for="user in users" v-bind:key="user.id" :value="user.id">{{user.name}}</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="type">Type</label>
-                        <select class="form-control" id="type" v-model="type" required>
-                            <option disabled selected value></option>
+                        <select class="form-control" id="type" v-model="type">
+                            <option disabled selected value>{{issue.Type}}</option>
                             <option value="Bug">Bug</option>
                             <option value="Enhancement">Enhancement</option>
                             <option value="Proposal">Proposal</option>
@@ -31,8 +31,8 @@
                     </div>
                     <div class="form-group">
                         <label for="priority">Priority</label>
-                        <select class="form-control" id="priority" v-model="priority" required>
-                            <option disabled selected value>Please select</option>
+                        <select class="form-control" id="priority" v-model="priority">
+                            <option disabled selected value>{{issue.Priority}}</option>
                             <option value="Trivial">Trivial</option>
                             <option value="Minor">Minor</option>
                             <option value="Major">Major</option>
@@ -42,8 +42,8 @@
                     </div>
                     <div class="form-group">
                         <label for="status">Status</label>
-                        <select class="form-control" id="status" v-model="status" required>
-                            <option disabled selected value>Please select</option>
+                        <select class="form-control" id="status" v-model="status">
+                            <option id="newstatus" disabled selected value>{{issue.Status}}</option>
                             <option value="New">New</option>
                             <option value="Open">Open</option>
                             <option value="On hold">On hold</option>
@@ -58,9 +58,9 @@
                         <label for="attachment">Attachment</label>
                         <input type="file" class="form-control-file" id="attachment">
                     </div>
-                    <a href="#" class="btn btn-primary" v-on:click="send">Create</a>
+                    <a href="#" class="btn btn-primary" v-on:click="editIssue">Edit</a>
                     <template>
-                      <router-link :to="{ path: '/', params: {}}" class="btn btn-primary" id="create-button" style="margin-right:85%">{{'Cancel'}}</router-link>
+                      <router-link :to="{ path: '/', params: {}}" class="btn cancel-button" id="cancel-button" style="margin-right:85%">{{'Cancel'}}</router-link>
                     </template>
             </form>
           </div>
@@ -76,10 +76,11 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import moment from 'moment'
 
 export default {
-  name: "IssueCreation",
+  name: "IssueEdit",
   data() {
       return {
-          issue: {},
+          issue: [],
+          issues: [],
           currentUser: {},
           users: {},
           errors: {},
@@ -102,44 +103,45 @@ export default {
     }).catch(e => {
         this.errors.push(e);
     });
-    HTTP.get('/issues'+this.issue.id).then(response => {
-      this.issue = response.data;
+    HTTP.get('/issues/' + this.$route.params.id).then(response => {
+        this.issue = response.data;
     }).catch(e => {
-      this.errors.push(e);
-    });
+        this.errors.push(e);
+    })
   },
   methods: {
-      send: function() {
+      editIssue: function() {
         var attachment = $('#attachment').prop('files')[0];
         const formData = new FormData();
         formData.append('file', attachment);
         var data = {
-            Title: this.title,
-            Description: this.description,
-            Status: this.status,
-            Priority: this.priority,
-            Type: this.type,
+            Title: title,
+            Description: description,
+            Status: newstatus.value,
+            Priority: priority,
+            Type: type,
+            assignee_id: assignee
         };
-        if (this.assignee !== "") {
-            data.assignee_id = this.assignee;
-        }
-        HTTP.put('/issues/'+this.issues.id, data).then(response => {
+        console.log("data: ", data);
+        HTTP.put('/issues/'+ this.issue.id, data).then(response => {
         var issue = response.data;
         if (attachment) {
-            HTTP.post('/issues/' + issue.id + '/attachment', formData).then(response => {
+            HTTP.post('/issues/' + this.$route.params.id + '/attachment', formData).then(response => {
                 this.$router.push({ name: 'issue', params: { id: issue.id }});
             });
         }
         else {
-            this.$router.push({ name: 'issue', params: { id: issue.id }});
+            this.$router.push({ path: '/', params: {}});
         }
         });
+        this.$router.push({ path: '/', params: {}});
+
       }
   }
 }
 </script>
 <style>
-.creation {
+.edit {
     margin-top: 20px;
     width: 100%;
 }

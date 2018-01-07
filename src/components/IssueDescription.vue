@@ -258,8 +258,8 @@ export default {
         this.commentTextArea = "";
     },
     deleteIssue: function (event){
-
         HTTP.delete("/issues/" + this.issue.id);
+        this.$router.push({ path: '/', params: {}});
     }
   }
 }
