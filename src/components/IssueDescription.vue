@@ -4,7 +4,7 @@
         <div class="col-md-8">
             <div class="container issue-description">
                 <h1>{{ issue.Title }} <span class="badge badge-secondary"> {{issue.Status}} </span></h1>
-                <p v-if="issue.creator"><b>{{issue.creator.name}}</b> created this issue {{issue.created_at | humanReadableTime }}</p>
+                <p><b>{{issue._links.creator.name}}</b> created this issue {{issue.created_at | humanReadableTime }}</p>
                 <p>{{ issue.Description }}</p>
                 <div v-if="attachment.url" class="attachment">
                     <img v-if="attachment.attachment_content_type.startsWith('image')" :src="attachment.url">
@@ -45,7 +45,7 @@
                         Open
                     </b-button>
 
-                    <b-dropdown right text="Menu">
+                    <b-dropdown right text="Workflow">
                     <b-dropdown-item v-on:click="changestatus('New')">New</b-dropdown-item>
                     <b-dropdown-item v-on:click="changestatus('Open')">Open</b-dropdown-item>
                     <b-dropdown-item v-on:click="changestatus('On Hold')">On Hold</b-dropdown-item>
@@ -68,12 +68,14 @@
             <br>
             <div class="right-box">
                 <dl>
-                    <dt>Assignee</dt> <dd v-if="issue._links"> {{issue._links.assignee.name}}</dd>
-                    <dt>Type</dt> <dd> {{issue.Type}}</dd>
-                    <dt>Status</dt> <dd> {{issue.Status}}</dd>
-                    <dt>Priority</dt> <dd> {{issue.Priority}}</dd>
-                    <dt>Votes</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Votes}}</span> <a href="#" v-on:click="vote"> vote this issue</a></dd>
-                    <dt>Watchers</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Watchers}}</span> <a href="#" v-on:click="watch"> watch this issue</a></dd>
+                    <dt>Assigned to</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{assignee: issue._links.assignee.id}}">{{(issue._links.assignee.name != null) ? issue._links.assignee.name : 'No one assigned'}}</router-link>
+                    <dt>Type</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{type: issue.Type}}">{{issue.Type}}</router-link>
+                    <dt>Status</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{status: issue.Status}}">{{issue.Status}}</router-link>
+                    <dt>Priority</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{priority: issue.Priority}}">{{issue.Priority}}</router-link>
+                    <dt>Votes</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Votes}}</span> 
+                        <a href="#" v-on:click="vote"> {{issue.is_voted_by_current_user ? 'unvote this issue' : 'vote this issue'}}</a></dd>
+                    <dt>Watchers</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Watchers}}</span> 
+                        <a href="#" v-on:click="watch"> {{issue.is_watched_by_current_user ? 'unwatch this issue' : 'watch this issue'}}</a></dd>
                 </dl>
             </div>
         </div>
@@ -311,4 +313,9 @@ dt {
 .attachment > .caption {
     display: block;
 }
+
+.dd-clickable:hover {
+    color: #0066ff
+}
+
 </style>

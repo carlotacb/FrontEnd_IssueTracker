@@ -73,11 +73,21 @@ export default {
     }
   },
   created() {
-    HTTP.get('/issues').then(response => {
-      this.issues = response.data;
-    }).catch(e => {
-      this.errors.push(e);
-    });
+    var query = this.$route.query;
+    if (query != null) {
+      HTTP.get(this.$route.fullPath).then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      });
+    }
+    else {
+      HTTP.get('/issues').then(response => {
+        this.issues = response.data;
+      }).catch(e => {
+        this.errors.push(e);
+      });
+    }
     HTTP.get('/users/current_user').then(response => {
       this.current_user = response.data;
     }).catch(e => {
@@ -88,6 +98,7 @@ export default {
     all: function (event) {
       HTTP.get('/issues').then(response => {
         this.issues = response.data;
+        this.$router.replace("/issues");
       }).catch(e => {
         this.errors.push(e);
       })
@@ -95,6 +106,7 @@ export default {
     open: function (event) {
       HTTP.get('/issues?status=New%26Open').then(response => {
         this.issues = response.data;
+        this.$router.replace('/issues?status=New%26Open');
       }).catch(e => {
         this.errors.push(e);
       })
@@ -102,6 +114,7 @@ export default {
     assignee: function (id) {
       HTTP.get('/issues?assignee='+id).then(response => {
         this.issues = response.data;
+        this.$router.replace('/issues?assignee='+id);
       }).catch(e => {
         this.errors.push(e);
       })
@@ -109,6 +122,7 @@ export default {
     watching: function (id) {
       HTTP.get('/issues?watcher='+id).then(response => {
         this.issues = response.data;
+        this.$router.replace('/issues?watcher='+id);
       }).catch(e => {
         this.errors.push(e);
       })
@@ -116,6 +130,7 @@ export default {
     status: function (status) {
       HTTP.get('/issues?status='+status).then(response => {
         this.issues = response.data;
+        this.$router.replace('/issues?status='+status);
       }).catch(e => {
         this.errors.push(e);
       })
@@ -123,6 +138,7 @@ export default {
     priority: function (priority) {
       HTTP.get('/issues?priority='+priority).then(response => {
         this.issues = response.data;
+        this.$router.replace('/issues?priority='+priority);
       }).catch(e => {
         this.errors.push(e);
       })
@@ -130,6 +146,7 @@ export default {
     type: function (type) {
       HTTP.get('/issues?type='+type).then(response => {
         this.issues = response.data;
+        this.$router.replace('/issues?type='+type);
       }).catch(e => {
         this.errors.push(e);
       })
@@ -158,7 +175,7 @@ export default {
 }
 
 .td-clickable:hover {
-  color: #008ae6
+  color: #0066ff
 }
 
 .filter-buttons{
