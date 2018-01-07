@@ -13,6 +13,5 @@ export default new Router({
     {name: 'issue', path: '/issues/:id', component: require("@/components/IssueDescription.vue").default},
     {name: 'issueNew', path: '/issues/new', component: require("@/components/IssueCreation.vue").default},
     {name: 'editIssue', path: '/issues/:id/edit', component: require("@/components/IssueEdit.vue").default},
-    {name: 'create', path: '/issues/new', component: require("@/components/IssueCreation.vue").default},
   ]
 })

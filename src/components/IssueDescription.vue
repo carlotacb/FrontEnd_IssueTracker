@@ -255,7 +255,7 @@ export default {
     },
     deleteIssue: function (event){
         HTTP.delete("/issues/" + this.issue.id);
-        this.$router.push({ path: '/', params: {}});
+        this.$router.push({ path: '/issues', params: {}});
     }
   }
 }

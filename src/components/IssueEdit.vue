@@ -6,11 +6,11 @@
             <form>
                     <div class="form-group">
                         <label for="title">Title</label>
-                        <textarea id="title" class="form-control" rows="1">{{issue.Title}}</textarea>
+                        <textarea id="title" class="form-control" rows="1" v-model="title"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea class="form-control" id="description" rows="3">{{issue.Description}}</textarea>
+                        <textarea class="form-control" id="description" rows="3" v-model="description"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="assignee">Assignee</label>
@@ -60,7 +60,7 @@
                     </div>
                     <a href="#" class="btn btn-primary" v-on:click="editIssue">Edit</a>
                     <template>
-                      <router-link :to="{ path: '/', params: {}}" class="btn cancel-button" id="cancel-button" style="margin-right:85%">{{'Cancel'}}</router-link>
+                      <router-link :to="{ path: '/issues', params: {}}" class="btn cancel-button" id="cancel-button" style="margin-right:85%">{{'Cancel'}}</router-link>
                     </template>
             </form>
           </div>
@@ -105,6 +105,12 @@ export default {
     });
     HTTP.get('/issues/' + this.$route.params.id).then(response => {
         this.issue = response.data;
+        this.priority = this.issue.Priority;
+        this.type = this.issue.Type;
+        this.status = this.issue.Status;
+        this.title = this.issue.Title;
+        this.description = this.issue.Description;
+        this.assignee = this.issue.assignee_id;
     }).catch(e => {
         this.errors.push(e);
     })
@@ -115,13 +121,15 @@ export default {
         const formData = new FormData();
         formData.append('file', attachment);
         var data = {
-            Title: title,
-            Description: description,
-            Status: newstatus.value,
-            Priority: priority,
-            Type: type,
-            assignee_id: assignee
+            Title: this.title,
+            Description: this.description,
+            Status: this.status,
+            Priority: this.priority,
+            Type: this.type
         };
+        if (this.assignee && this.assignee !== "") {
+            data.assignee_id = this.assignee;
+        }
         console.log("data: ", data);
         HTTP.put('/issues/'+ this.issue.id, data).then(response => {
         var issue = response.data;
@@ -131,10 +139,9 @@ export default {
             });
         }
         else {
-            this.$router.push({ path: '/', params: {}});
+            this.$router.push({ name: 'issue', params: { id: issue.id }});
         }
         });
-        this.$router.push({ path: '/', params: {}});
 
       }
   }
