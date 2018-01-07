@@ -86,9 +86,9 @@
                     <dt>Type</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{type: issue.Type}}">{{issue.Type}}</router-link>
                     <dt>Status</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{status: issue.Status}}">{{issue.Status}}</router-link>
                     <dt>Priority</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{priority: issue.Priority}}">{{issue.Priority}}</router-link>
-                    <dt>Votes</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Votes}}</span> 
+                    <dt>Votes</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Votes}}</span>
                         <a href="#" v-on:click="vote"> {{issue.is_voted_by_current_user ? 'unvote this issue' : 'vote this issue'}}</a></dd>
-                    <dt>Watchers</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Watchers}}</span> 
+                    <dt>Watchers</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Watchers}}</span>
                         <a href="#" v-on:click="watch"> {{issue.is_watched_by_current_user ? 'unwatch this issue' : 'watch this issue'}}</a></dd>
                 </dl>
             </div>
@@ -96,8 +96,8 @@
 
         <div class="col-md-4 margin">
 
-            
-            
+
+
             <div class="modal fade" id="attachModal" tabindex="-1" role="dialog" aria-labelledby="titleModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -221,7 +221,6 @@ export default {
         });
     },
     vote: function(event) {
-
       HTTP.post("/issues/" + this.issue.id + "/vote").then(response => {
         this.issue = response.data;
       }).catch(e => {
