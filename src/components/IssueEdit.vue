@@ -15,7 +15,7 @@
                     <div class="form-group">
                         <label for="assignee">Assignee</label>
                         <select class="form-control" id="assignee" v-model="assignee">
-                            <option disabled selected value>{{ issue._links.assignee.name }}</option>
+                            <option disabled selected value v-if="assignee === ''">None</option>
                             <option v-for="user in users" v-bind:key="user.id" :value="user.id">{{user.name}}</option>
                         </select>
                     </div>
@@ -110,7 +110,8 @@ export default {
         this.status = this.issue.Status;
         this.title = this.issue.Title;
         this.description = this.issue.Description;
-        this.assignee = this.issue.assignee_id;
+        if (this.issue._links.assignee.id)
+            this.assignee = this.issue._links.assignee.id;
     }).catch(e => {
         this.errors.push(e);
     })
