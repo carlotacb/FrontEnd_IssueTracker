@@ -4,11 +4,12 @@
         <div class="col-md-8">
             <div class="container issue-description">
                 <h1>{{ issue.Title }} <span class="badge badge-secondary"> {{issue.Status}} </span></h1>
-                <p><b>{{issue._links.creator.name}}</b> created this issue {{issue.created_at | humanReadableTime }}</p>
+                <p><b>{{issue._links.creator.name}}</b> created this issue {{issue.created_at | humanReadableTime }}<span v-if="issue.created_at !== issue.updated_at">, last updated {{issue.updated_at | humanReadableTime }}</span></p>
                 <p>{{ issue.Description }}</p>
                 <div v-if="attachment.url" class="attachment">
                     <img v-if="attachment.attachment_content_type.startsWith('image')" :src="attachment.url">
-                    <a class="caption" :href="attachment.url">{{attachment.attachment_file_name}}</a>
+                    <span class="caption"><a :href="attachment.url">{{attachment.attachment_file_name}}</a> <span>({{attachment.attachment_content_type}})</span></span>
+                    <span class="caption">Last updated {{attachment.attachment_updated_at | humanReadableTime}}</span>
                 </div>
                 <div class="separator"><hr /></div>
             </div>
@@ -303,11 +304,12 @@ dt {
 .attachment {
     vertical-align: top;
     display: inline-block;
-    text-align: center;
+    text-align: left;
 }
 
 .attachment > img {
-    max-width: 100px;
+    max-width: 200px;
+    max-height: 200px;
 }
 
 .attachment > .caption {
