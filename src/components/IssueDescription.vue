@@ -18,14 +18,27 @@
                 <div class="comment" v-for="comment in comments" :key="comment.id">
                     <p><b>{{comment.creator.name || "Nom usuari"}}</b><br>
                     {{comment.body}}</p>
-                    <a v-if="comment.attachment" :href="comment.attachment.url"><img v-if="comment.attachment" :src="comment.attachment.url"></a>
-                    <p>{{comment.created_at | humanReadableTime}} <a href="#" v-on:click="deleteComment(comment)">Delete</a> </p>
+                    <a v-if="comment.attachment" :href="comment.attachment.url"><img class="comment-attachment" v-if="comment.attachment" :src="comment.attachment.url"></a>
+                    <p>{{comment.created_at | humanReadableTime}} <span v-if="currentUser.id === comment.creator.id"> <a  href="#" v-on:click="deleteComment(comment)">Delete</a> <a :href="'#' + comment.id" data-toggle="collapse" >Edit</a></span></p>
+                    <div :id="comment.id" class="edit-comment collapse">
+                        <form>
+                            <div class="form-group">
+                                <label for="commentBody">Editing the comment</label>
+                                <textarea :value="comment.body" class="form-control" :id="'commentBody' + comment.id" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <input type="file" class="form-control-file" :id="'attachmentUpload' + comment.id">
+                            </div>
+                            <button type="button" v-on:click="editComment(comment)" class="btn btn-primary" :href="'#' + comment.id" data-toggle="collapse">Edit</button>
+                            <button type="button" class="btn btn-primary" :href="'#' + comment.id" data-toggle="collapse">Cancel</button>
+                        </form>
+                    </div>
                 </div>
 
                 <form>
                     <div class="form-group">
                         <label for="commentBody">What do you want to say?</label>
-                        <textarea v-model="commentTextArea" class="form-control" id="commentBody" rows="3"></textarea>
+                        <textarea v-model="commentTextArea" class="form-control" id="commentBody" rows="3" required></textarea>
                     </div>
                     <div class="form-group">
                         <input type="file" class="form-control-file" id="attachmentUpload">
@@ -59,7 +72,7 @@
                 </b-button-group>
             </div>
             <br>
-            <div class="buttons">
+            <div class="buttons" v-if="currentUser.id === parseInt(issue._links.creator.id)">
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#attachModal">
                     Attach
                 </button>
@@ -148,6 +161,7 @@ export default {
         var creationDate = new Date();
         creationDate.setTime(Date.parse(issue.created_at));
         this.issue.creationDateString =creationDate.toDateString();
+        this.$forceUpdate();
     }).catch(e => {
         this.errors.push(e);
     });
@@ -250,6 +264,7 @@ export default {
                 HTTP.post("/issues/" + this.issue.id + "/comments/" + comment.id + "/attachment", formData
                 ).then(response => {
                     console.log("updating comments");
+                    comment.attachment = response.data;
                     this.comments.push(comment);
                     console.log(this.comments);
                 });
@@ -261,6 +276,26 @@ export default {
             }
         });
         this.commentTextArea = "";
+    },
+    editComment: function(com) {
+        var commentBody = $('#commentBody' + com.id)[0].value;
+        var commentAttachment = $('#attachmentUpload' + com.id).prop('files')[0];
+        const formData = new FormData();
+        formData.append('file', commentAttachment);
+        HTTP.put('/issues/' + this.issue.id + '/comments/' + com.id, {
+            body: commentBody
+        }).then(response => {
+            if (commentAttachment) {
+                 HTTP.post("/issues/" + this.issue.id + "/comments/" + com.id + "/attachment", formData
+                ).then(response => {
+                    com.attachment = response.data;
+                    this.$forceUpdate();
+                });
+            }
+            var index = this.comments.indexOf(com);
+            this.comments[index].body = response.data.body;
+            this.$forceUpdate();
+        });
     },
     deleteIssue: function (event){
         HTTP.delete("/issues/" + this.issue.id);
@@ -315,7 +350,7 @@ dt {
     text-align: left;
 }
 
-.attachment > img {
+.attachment > img, .comment-attachment {
     max-width: 200px;
     max-height: 200px;
 }
