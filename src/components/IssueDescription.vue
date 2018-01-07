@@ -4,7 +4,7 @@
         <div class="col-md-8">
             <div class="container issue-description">
                 <h1>{{ issue.Title }} <span class="badge badge-secondary"> {{issue.Status}} </span></h1>
-                <p v-if="issue.creator"><b>{{issue.creator.name}}</b> created this issue {{issue.created_at | humanReadableTime }}</p>
+                <p><b>{{issue._links.creator.name}}</b> created this issue {{issue.created_at | humanReadableTime }}</p>
                 <p>{{ issue.Description }}</p>
                 <div v-if="attachment.url" class="attachment">
                     <img v-if="attachment.attachment_content_type.startsWith('image')" :src="attachment.url">
@@ -34,53 +34,55 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <br>
-            <div class="right">
-                <dl>
-                        <b-button v-on:click="deleteIssue">Delete Issue</b-button>
-                        
-                   
-                    <template>
-                        <router-link :to="{ name: 'editIssue', params: {}}" class="btn btn-primary">{{'Edit Issue'}}</router-link>
-                    </template>
-                </dl>
+        <div class="col-md-4 issue-description">
+            <div class="buttons">
+                <b-button-group>
+
+                    <b-button v-if="issue.Status == 'Open' || issue.Status == 'New'" variant="primary" v-on:click="changestatus('Resolved')">
+                        Resolve
+                    </b-button>
+                    <b-button v-else variant="primary" v-on:click="changestatus('Open')">
+                        Open
+                    </b-button>
+
+                    <b-dropdown right text="Workflow">
+                    <b-dropdown-item v-on:click="changestatus('New')">New</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Open')">Open</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('On Hold')">On Hold</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Resolved')">Resolved</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Duplicate')">Duplicate</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Invalid')">Invalid</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Won\'t fix')">Won't fix</b-dropdown-item>
+                    <b-dropdown-item v-on:click="changestatus('Closed')">Closed</b-dropdown-item>
+                    </b-dropdown>
+                </b-button-group>
             </div>
+            <br>
+            <div class="buttons">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#attachModal">
+                    Attach
+                </button>
+                <b-button v-on:click="deleteIssue">Delete Issue</b-button>
+                <router-link :to="{ name: 'editIssue', params: {}}" class="btn btn-primary">{{'Edit Issue'}}</router-link>
+            </div>
+            <br>
             <div class="right-box">
                 <dl>
-                    <dt>Assignee</dt> <dd v-if="issue._links"> {{issue._links.assignee.name}}</dd>
-                    <dt>Type</dt> <dd> {{issue.Type}}</dd>
-                    <dt>Status</dt> <dd> {{issue.Status}}</dd>
-                    <dt>Priority</dt> <dd> {{issue.Priority}}</dd>
-                    <dt>Votes</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Votes}}</span> <a href="#" v-on:click="vote"> vote this issue</a></dd>
-                    <dt>Watchers</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Watchers}}</span> <a href="#" v-on:click="watch"> watch this issue</a></dd>
+                    <dt>Assigned to</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{assignee: issue._links.assignee.id}}">{{(issue._links.assignee.name != null) ? issue._links.assignee.name : 'No one assigned'}}</router-link>
+                    <dt>Type</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{type: issue.Type}}">{{issue.Type}}</router-link>
+                    <dt>Status</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{status: issue.Status}}">{{issue.Status}}</router-link>
+                    <dt>Priority</dt> <router-link tag="dd" class="dd-clickable" :to="{ path: '/issues', query:{priority: issue.Priority}}">{{issue.Priority}}</router-link>
+                    <dt>Votes</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Votes}}</span> 
+                        <a href="#" v-on:click="vote"> {{issue.is_voted_by_current_user ? 'unvote this issue' : 'vote this issue'}}</a></dd>
+                    <dt>Watchers</dt> <dd><span class="badge badge-pill badge-primary"> {{issue.Watchers}}</span> 
+                        <a href="#" v-on:click="watch"> {{issue.is_watched_by_current_user ? 'unwatch this issue' : 'watch this issue'}}</a></dd>
                 </dl>
             </div>
         </div>
 
         <div class="col-md-4 margin">
 
-            <b-button-group>
-
-                <b-button variant="primary" v-on:click="changetoResolvedOpen">
-                {{issue.Status}}
-                </b-button>
-
-                <b-dropdown right text="Menu">
-                <b-dropdown-item v-on:click="changestatus('New')">New</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Open')">Open</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('On Hold')">On Hold</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Resolved')">Resolved</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Duplicate')">Duplicate</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Invalid')">Invalid</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Won\'t fix')">Won't fix</b-dropdown-item>
-                <b-dropdown-item v-on:click="changestatus('Closed')">Closed</b-dropdown-item>
-                </b-dropdown>
-            </b-button-group>
-
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#attachModal">
-                Attach
-            </button>
+            
             
             <div class="modal fade" id="attachModal" tabindex="-1" role="dialog" aria-labelledby="titleModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -213,14 +215,8 @@ export default {
       })
 
     },
-    changetoResolvedOpen: function (event) {
-      data.seen = !data.seen;
-      data.button.text = data.seen ? 'Resolved' : 'Open';
-
-      // Falta que canvi l'estatus a Open o Resolved amb la URL
-    },
     changestatus: function (newstatus) {
-      HTTP.post("/issues/" + this.issue.id + "/status", {
+      HTTP.put("/issues/" + this.issue.id + "/status", {
         status: newstatus
       }).then(response => {
         this.issue = response.data;
@@ -277,12 +273,15 @@ export default {
 }
 
 .right-box {
-    margin-top: 2rem;
+    margin-top: 1rem;
     text-align: left;
     padding: 5px;
     border: solid 1px #cccccc;
     border-radius: 5px;
 }
+
+.buttons {}
+
 .right-box > dl {
     margin-bottom: 0.1rem;
 }
@@ -314,4 +313,9 @@ dt {
 .attachment > .caption {
     display: block;
 }
+
+.dd-clickable:hover {
+    color: #0066ff
+}
+
 </style>
