@@ -7,7 +7,7 @@
                 <p><b>{{issue._links.creator.name}}</b> created this issue {{issue.created_at | humanReadableTime }}<span v-if="issue.created_at !== issue.updated_at">, last updated {{issue.updated_at | humanReadableTime }}</span></p>
                 <p>{{ issue.Description }}</p>
                 <div v-if="attachment.url" class="attachment">
-                    <img v-if="attachment.attachment_content_type.startsWith('image')" :src="attachment.url">
+                    <a v-if="attachment.attachment_content_type.startsWith('image')" :href="attachment.url"><img :src="attachment.url"></a>
                     <span class="caption"><a :href="attachment.url">{{attachment.attachment_file_name}}</a> <span>({{attachment.attachment_content_type}})</span></span>
                     <span class="caption">Last updated {{attachment.attachment_updated_at | humanReadableTime}}</span>
                 </div>
