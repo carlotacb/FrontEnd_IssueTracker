@@ -19,7 +19,7 @@
                     <p><b>{{comment.creator.name || "Nom usuari"}}</b><br>
                     {{comment.body}}</p>
                     <a v-if="comment.attachment" :href="comment.attachment.url"><img v-if="comment.attachment" :src="comment.attachment.url"></a>
-                    <p>{{comment.created_at | humanReadableTime}}</p>
+                    <p>{{comment.created_at | humanReadableTime}} <a href="#" v-on:click="deleteComment(comment)">Delete</a> </p>
                 </div>
 
                 <form>
@@ -163,22 +163,21 @@ export default {
         this.errors.push(e);
     });
     HTTP.get('/issues/' + this.$route.params.id + '/comments').then(response => {
-        var comments = response.data;
+        var coms = response.data;
         //this.comments = response.data;
         var i = 0;
-        for (i = 0; i < comments.length; i++) {
-           comments[i].creator = comments[i]._links.creator;
-           var comment = comments[i];
-           if (comment._links.attachment) {
+        for (i = 0; i < coms.length; i++) {
+            coms[i].creator = coms[i]._links.creator;
+            var comment = coms[i];
+            if (comment._links.attachment) {
                 console.log(comment._links.attachment);
+                const commentWithAttachment = comment;
                 HTTP.get(comment._links.attachment.href).then(response=> {
-                    comment.attachment = response.data;
-                    this.comments.push(comment);
+                    commentWithAttachment.attachment = response.data;
+                    this.$forceUpdate();
                 });
-           }
-           else {
-               this.comments.push(comment);
-           }
+            }
+            this.comments.push(comment);
         }
     }).catch(e => {
         this.errors.push(e);
@@ -197,6 +196,15 @@ export default {
     },
     reload: function() {
 
+    },
+    deleteComment: function(com) {
+        HTTP.delete('/issues/' + this.issue.id + '/comments/' + com.id).then(response => {
+            const index = this.comments.indexOf(com);
+            if (index !== -1) {
+                this.comments.splice(index, 1);
+            }
+            this.$forceUpdate();
+        });
     },
     vote: function(event) {
 
