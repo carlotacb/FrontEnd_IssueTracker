@@ -1,6 +1,6 @@
 # IssueTracker (Front-End)
 
-This project is a Issue Tracker, the idea was to be similar as the one on [Bitbucket](https://bitbucket.org/) and was implemented using Vue.js framework during Web Applications and Services (ASW) subject of the Bachelor's Degree in Computer Science of the [Universitat Politècnica de Catalunya](https://www.upc.edu/ca) - [Facultat d'informàtica de Barcelona](https://www.fib.upc.edu/) during Q1 2017/2018.
+This project is a Issue Tracker, the idea was to be similar as the one on [Bitbucket](https://bitbucket.org/) and was implemented using Vue.js framework during [Web Applications and Services](https://www.fib.upc.edu/ca/estudis/graus/grau-en-enginyeria-informatica/pla-destudis/assignatures/ASW) subject of the Bachelor's Degree in Computer Science of the [Universitat Politècnica de Catalunya](https://www.upc.edu/ca) - [Facultat d'informàtica de Barcelona](https://www.fib.upc.edu/) during Q1 2017/2018.
 
 The web was deployed in Heroku, in the Link: https://issue-tracker-frontend.herokuapp.com/
 
